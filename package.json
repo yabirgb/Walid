@@ -1,0 +1,14 @@
+{
+  "name": "bot",
+  "version": "0.0.1",
+  "description": "A bot to remember things",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yabir G.",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose-find-one-or-create": "^0.2.0"
+  }
+}
