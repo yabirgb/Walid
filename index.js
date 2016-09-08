@@ -17,7 +17,7 @@ var token = '240521639:AAEOAEoYsEFNwqQWT7csYlxu5jVr4ErtInM';
 var UserSchema = new Schema ({
   username: {type:String, default: null},
   telegramId: String,
-  links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: false}}],
+  links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: true}}],
   secret: String,
   time : { type : Date }
 });
@@ -49,6 +49,12 @@ var checker = function(list){
     }
   }
   return final;
+}
+
+var atLeastOneURL = function(obj){
+  if (obj.type === 'url'){
+    return true
+  }
 }
 
 //Get the user in database
@@ -95,56 +101,53 @@ bot.onText(/\/love/, function (msg) {
 // Any kind of message
 bot.on('message', function (msg) {
   var chatId = msg.chat.id;
-
+  console.log("===========")
+  console.log(msg);
   if ("entities" in msg){
-    for (var e = 0; e < msg.entities.length; e++) {
-      if(msg.entities[e].type === 'url'){
-        var parts = msg.text.split(" ");
-        var url = checker(parts);
+    //Filter using the criteria of at least one url in the entities
+    if(msg.entities.filter(atLeastOneURL)){
+      var parts = msg.text.split(" ");
+      var url = checker(parts);
 
-        User.findOneOrCreate({username: msg.from.username}, {username: msg.from.username, telegramId: msg.from.id, secret: crypto.randomBytes(32).toString('hex')}, function(err, person) {
-          if(err){
-            bot.sendMessage(chatId, err)
-          }
-          //Avoid repeting url and able to add multiple
-          // for each url
-          for (var i = 0; i < url.length; i++) {
-            //if no links
-            if (person.links.length === 0) {
-              person.links.push({link: url[i]});
+      User.findOneOrCreate({username: msg.from.username}, {username: msg.from.username, telegramId: msg.from.id, secret: crypto.randomBytes(32).toString('hex')}, function(err, person) {
+        if(err){
+          bot.sendMessage(chatId, err)
+        }
+        for (var i = 0; i < url.length; i++) {
+          var found = false;
+          var sec = i;
+          for (var z = 0; z < person.links.length; z++) {
+            //If we find it change the var
+            if (url[i] === person.links[z].link && person.links.length !== 0 ) {
+              found = true;
+              break;
             }
-            else{
-              //Initialy we havent found it
-              var found = false;
-              //for each link in database
-              for (var z = 0; z < person.links.length; z++) {
-                //If we find it change the var
-                if (url[i] === person.links[z].link && person.links.length !== 0 ) {
-                  found = true;
-                  break;
+          }
+
+          if (found === false)
+          {
+            User.update(
+              { "secret": person.secret },
+              { "$addToSet": { "links": {"link":url[i]} }},
+              function(err, result) {
+                if (err){
+                  return handleError(err);
                 }
               }
-              //If we have not found it
-              if (found === false)
-              {
-                //Save it
-                person.links.push({link: url[i]});
-              }
-            }
+            );
             person.save(function (err) {
-              if (err) return handleError(err);
+              if(err) { return handleError(err)}else{
+                bot.sendMessage(chatId, "Added "+ url[sec] + " to the database")
+              };
+
             });
-            //Tell the user if we add or is already in
-            if(found === false){
-              bot.sendMessage(chatId, 'Added ' + url.join(" ") + " to the database");
-            }
-            else{
-              bot.sendMessage(chatId, "This url is already on my database, I'm not adding it for now.");
-            }
-          }//end "for" for url
-        }) //end of find or create
-      }// end of spin throw entities that are url
-    }//end with entities
+          }
+          else{
+            bot.sendMessage(chatId, "I already have this link!")
+          }
+        }
+      }) //end of find or create
+    }// end of spin throw entities that are url
   }//check if there are any entities
 
   //if there is not any url
