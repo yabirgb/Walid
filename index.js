@@ -19,7 +19,8 @@ var UserSchema = new Schema ({
   telegramId: String,
   links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: true}}],
   secret: String,
-  time : { type : Date }
+  time : { type : Date },
+  waitingReply: {type: Boolean, default: false},
 });
 UserSchema.plugin(findOneOrCreate);
 
@@ -38,9 +39,11 @@ db.once('open', function() {
 
 //========================================
 //Telegram
+
+
 var bot = new TelegramBot(token, {polling: true});
 
-//Look for urls in a list
+//Look for urls in a list, returns a list with all the urls
 var checker = function(list){
   var final = [];
   for (var i = 0; i < list.length; i++) {
@@ -83,6 +86,48 @@ bot.onText(/\/echo (.+)/, function (msg, match) {
 bot.onText(/\/me/, function (msg, match) {
   var fromId = msg.from.id;
   bot.sendMessage(fromId, "from me")
+});
+
+bot.onText(/\/location/, function (msg) {
+  var chatId = msg.chat.id
+  var opts = {
+    reply_markup: JSON.stringify(
+      {
+        force_reply: true
+      }
+  )};
+
+  bot.sendMessage(msg.from.id, 'Which country do you live in?', opts)
+    .then(function (sended) {
+      var chatId = sended.chat.id;
+      var messageId = sended.message_id;
+
+      //Tell the database we are waiting for a user to reply
+      User.findOne({telegramId: msg.from.id}, function (err, user) {
+        user.waitingReply = true;
+        user.save().then(function(err, result) {
+          if (err) {
+            console.log(err)
+          }
+        });
+      });
+
+      bot.onReplyToMessage(chatId, messageId, function (message) {
+        console.log('User flag is %s', message.text);
+
+        //tell database user has answered
+        User.findOne({telegramId: msg.from.id}, function (err, user) {
+          user.waitingReply = false;
+          user.save(function (err) {
+            if(err) {
+                console.error('ERROR saving repply');
+            }
+          });
+        });
+
+      });
+    });
+
 });
 
 bot.onText(/\/love/, function (msg) {
@@ -137,7 +182,10 @@ bot.on('message', function (msg) {
             );
             person.save(function (err) {
               if(err) { return handleError(err)}else{
-                bot.sendMessage(chatId, "Added "+ url[sec] + " to the database")
+                opts = {
+                  disable_web_page_preview: true
+                }
+                bot.sendMessage(chatId, "Added "+ url[sec] + " to the database", opts)
               };
 
             });
@@ -152,7 +200,15 @@ bot.on('message', function (msg) {
 
   //if there is not any url
   else{
-    bot.sendMessage(chatId, "Sadly I'm not programmed to understand you :(");
+    User.findOne({telegramId: msg.from.id}, function (err, user) {
+      if (!user.waitingReply) {
+        bot.sendMessage(chatId, "Sadly I'm not programmed to understand you :(");
+      }
+      if (err) {
+        console.log(err)
+      }
+    });
+
   }
 
 
