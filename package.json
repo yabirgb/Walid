@@ -9,6 +9,9 @@
   "author": "Yabir G.",
   "license": "MIT",
   "dependencies": {
-    "mongoose-find-one-or-create": "^0.2.0"
+    "countryjs": "^1.5.2",
+    "emoji-text": "^0.2.6",
+    "mongoose-find-one-or-create": "^0.2.0",
+    "wemoji": "^1.0.0"
   }
 }

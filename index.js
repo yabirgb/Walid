@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const emojiText = require("emoji-text");
+const country = require('countryjs');
 
 var TelegramBot = require('node-telegram-bot-api');
 var mongoose = require('mongoose');
@@ -21,6 +23,7 @@ var UserSchema = new Schema ({
   secret: String,
   time : { type : Date },
   waitingReply: {type: Boolean, default: false},
+  timezone: String,
 });
 UserSchema.plugin(findOneOrCreate);
 
@@ -61,18 +64,15 @@ var atLeastOneURL = function(obj){
 }
 
 //Get the user in database
-var getUser = function(msg){
-  var user;
-  try{
-    user = User.findOne({'telegramId':msg.from.id});
-  }
-  catch(e){
-    user = new User({username:msg.from.username,telegramId: msg.from.id, secret: crypto.randomBytes(32).toString('hex')});
-    user.save(function(err) {
-      if (err) throw err;
-    })
-  }
-  return user;
+var waitReply = function(id, state){
+  User.findOne({telegramId: id}, function (err, user) {
+    user.waitingReply = state;
+    user.save(function (err) {
+      if(err) {
+          console.error('ERROR saving repply');
+      }
+    });
+  });
 }
 
 
@@ -103,31 +103,66 @@ bot.onText(/\/location/, function (msg) {
       var messageId = sended.message_id;
 
       //Tell the database we are waiting for a user to reply
-      User.findOne({telegramId: msg.from.id}, function (err, user) {
-        user.waitingReply = true;
-        user.save().then(function(err, result) {
-          if (err) {
-            console.log(err)
-          }
-        });
-      });
+      waitReply(msg.from.id, true)
 
       bot.onReplyToMessage(chatId, messageId, function (message) {
-        console.log('User flag is %s', message.text);
-
         //tell database user has answered
-        User.findOne({telegramId: msg.from.id}, function (err, user) {
-          user.waitingReply = false;
-          user.save(function (err) {
-            if(err) {
-                console.error('ERROR saving repply');
+        waitReply(msg.from.id, false);
+
+        //extract flag from string
+
+        var textSplited = emojiText.convert(message.text, {delimiter:""}).split(" ");
+
+        //for each element in the message
+        for (var i = 0; i < textSplited.length; i++) {
+          //if we found a flag
+          if (textSplited[i].indexOf('flag') !== -1) {
+            User.findOneOrCreate({telegramId: message.from.id},{username: msg.from.username, telegramId: msg.from.id, secret: crypto.randomBytes(32).toString('hex')},function (err, user) {
+              var country = textSplited[i].replace('flag', '').toUpperCase()
+              var timezone = country.timezones(country)
+              console.log(timezone)
+              if (timezone.length > 1){
+                var opts = {
+                  reply_markup: JSON.stringify({
+                    one_time_keyboard: true,
+                    keyboard: [timezone]
+                    })
+                };
+                bot.sendMessage(chatId, "There are many timezones! Choose one", opts)
+                  .then(function (sended) {
+                    waitReply(message.from.id, true)
+
+                    var chatId = sended.chat.id;
+                    var messageId = sended.message_id;
+                    bot.onReplyToMessage(chatId, messageId, function (reply_markup_message) {
+                      //tell database user has answered
+                      waitReply(msg.from.id, false)
+                      user.timezone = reply_markup_message;
+                    });
+                  })
+                user.save(function (err) {
+                  if(err) {
+                    console.error('ERROR saving timezone');
+                  }
+                });
+
             }
+            else{
+              user.timezone = timezone;
+              user.save(function (err) {
+                if(err) {
+                  console.error('ERROR saving timezone');
+                }
+              });
+            }
+
           });
-        });
+        }
+      break;
+      }
 
-      });
     });
-
+  });
 });
 
 bot.onText(/\/love/, function (msg) {
