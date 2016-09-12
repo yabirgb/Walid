@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const emojiText = require("emoji-text");
-const country = require('countryjs');
+var country = require('countryjs');
 
 var TelegramBot = require('node-telegram-bot-api');
 var mongoose = require('mongoose');
@@ -23,6 +23,7 @@ var UserSchema = new Schema ({
   secret: String,
   time : { type : Date },
   waitingReply: {type: Boolean, default: false},
+  waitingTimezone: {type: Boolean, default: false},
   timezone: String,
 });
 UserSchema.plugin(findOneOrCreate);
@@ -75,6 +76,17 @@ var waitReply = function(id, state){
   });
 }
 
+var waitingTimezone = function(id, state){
+  User.findOne({telegramId: id}, function (err, user) {
+    user.waitingTimezone = state;
+    user.save(function (err) {
+      if(err) {
+          console.error('ERROR saving waitingTimezone');
+      }
+    });
+  });
+}
+
 
 // Matches /echo [whatever]
 bot.onText(/\/echo (.+)/, function (msg, match) {
@@ -89,6 +101,7 @@ bot.onText(/\/me/, function (msg, match) {
 });
 
 bot.onText(/\/location/, function (msg) {
+  var userID = ""
   var chatId = msg.chat.id
   var opts = {
     reply_markup: JSON.stringify(
@@ -101,6 +114,7 @@ bot.onText(/\/location/, function (msg) {
     .then(function (sended) {
       var chatId = sended.chat.id;
       var messageId = sended.message_id;
+      userID = msg.from.id;
 
       //Tell the database we are waiting for a user to reply
       waitReply(msg.from.id, true)
@@ -112,33 +126,29 @@ bot.onText(/\/location/, function (msg) {
         //extract flag from string
 
         var textSplited = emojiText.convert(message.text, {delimiter:""}).split(" ");
+        //console.log(textSplited)
 
         //for each element in the message
         for (var i = 0; i < textSplited.length; i++) {
           //if we found a flag
+
           if (textSplited[i].indexOf('flag') !== -1) {
             User.findOneOrCreate({telegramId: message.from.id},{username: msg.from.username, telegramId: msg.from.id, secret: crypto.randomBytes(32).toString('hex')},function (err, user) {
-              var country = textSplited[i].replace('flag', '').toUpperCase()
-              var timezone = country.timezones(country)
-              console.log(timezone)
+              var country_upper = textSplited[i].replace('flag-', '').toUpperCase()
+              var timezone = country.timezones(country_upper);
+              //console.log(country_upper);
+              //console.log(timezone);
               if (timezone.length > 1){
-                var opts = {
+                var opts_timezone = {
                   reply_markup: JSON.stringify({
                     one_time_keyboard: true,
                     keyboard: [timezone]
-                    })
+                  })
                 };
-                bot.sendMessage(chatId, "There are many timezones! Choose one", opts)
-                  .then(function (sended) {
-                    waitReply(message.from.id, true)
-
-                    var chatId = sended.chat.id;
-                    var messageId = sended.message_id;
-                    bot.onReplyToMessage(chatId, messageId, function (reply_markup_message) {
-                      //tell database user has answered
-                      waitReply(msg.from.id, false)
-                      user.timezone = reply_markup_message;
-                    });
+                bot.sendMessage(chatId, "There are many timezones! Choose one", opts_timezone)
+                  .then(function (sendedTimezone) {
+                    waitReply(userID, true);
+                    waitingTimezone(userID, true)
                   })
                 user.save(function (err) {
                   if(err) {
@@ -155,10 +165,9 @@ bot.onText(/\/location/, function (msg) {
                 }
               });
             }
-
           });
+        break;
         }
-      break;
       }
 
     });
@@ -238,6 +247,13 @@ bot.on('message', function (msg) {
     User.findOne({telegramId: msg.from.id}, function (err, user) {
       if (!user.waitingReply) {
         bot.sendMessage(chatId, "Sadly I'm not programmed to understand you :(");
+      }
+      else if (user.waitingReply && user.waitingTimezone) {
+        user.timezone = msg.text;
+        waitReply(msg.from.id, false);
+        waitingTimezone(msg.from.id, false)
+        user.save();
+        bot.sendMessage(chatId, "Saved timezone for you " + user.timezone);
       }
       if (err) {
         console.log(err)
