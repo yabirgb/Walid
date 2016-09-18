@@ -87,6 +87,10 @@ var waitingTimezone = function(id, state){
   });
 }
 
+var pack = function(n){
+	return [n]
+}
+
 
 // Matches /echo [whatever]
 bot.onText(/\/echo (.+)/, function (msg, match) {
@@ -106,6 +110,7 @@ bot.onText(/\/location/, function (msg) {
   var opts = {
     reply_markup: JSON.stringify(
       {
+        one_time_keyboard: true,
         force_reply: true
       }
   )};
@@ -142,7 +147,7 @@ bot.onText(/\/location/, function (msg) {
                 var opts_timezone = {
                   reply_markup: JSON.stringify({
                     one_time_keyboard: true,
-                    keyboard: [timezone]
+                    keyboard: timezone.map(pack)
                   })
                 };
                 bot.sendMessage(chatId, "There are many timezones! Choose one", opts_timezone)
@@ -157,7 +162,7 @@ bot.onText(/\/location/, function (msg) {
                 });
 
             }
-            else{
+            else if (timezone.length === 0){
               user.timezone = timezone;
               user.save(function (err) {
                 if(err) {

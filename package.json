@@ -11,7 +11,9 @@
   "dependencies": {
     "countryjs": "^1.5.2",
     "emoji-text": "^0.2.6",
+    "moment": "^2.15.0",
     "mongoose-find-one-or-create": "^0.2.0",
+    "node-cron": "^1.1.2",
     "wemoji": "^1.0.0"
   }
 }
