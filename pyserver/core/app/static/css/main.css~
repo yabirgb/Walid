@@ -1,0 +1,23 @@
+@font-face {
+    font-family: "raleway";
+    src:  url("/static/fonts/raleway_thin-webfont.eot");
+    src:  url("/static/fonts/raleway_thin-webfont.ttf") format('truetype'),
+          url("/static/fonts/raleway_thin-webfont.svg") format('svg'),
+          url("/static/fonts/raleway_thin-webfont.woff") format('woff');
+}
+
+body{
+  background-color: #008ed6;
+  font-family: "raleway", Verdana, Tahoma;
+  color: white;
+}
+
+h1, h2{
+  text-align: center;
+  font-size: 500%;
+}
+
+h4{
+  text-align: center;
+  font-family: "raleway", Verdana, Tahoma;
+}

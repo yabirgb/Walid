@@ -1,0 +1,12 @@
+from flask import Flask
+from flask_pymongo import PyMongo
+
+app = Flask(__name__)
+
+app.static_folder = 'static'
+
+
+app.config['user'] = 'user'
+mongo = PyMongo(app, config_prefix='user')
+
+from app import views

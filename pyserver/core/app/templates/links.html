@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {{user[0]}}
+  <h2>Hello {{user.username}}</h2>
+  <h4>Your secret code is {{user.secret}}</h4>
+
+  <div class="container">
+    <table class="table">
+      <thead>
+	<th>Url</th>
+	<th>Date</th>
+	<th>Status</th>
+	<th>Private</th>
+      </thead>
+      <tbody>
+	{%for obj in user.links|sort(attribute='date', reverse=True) %}
+	<tr>
+	  <td><a href="{{obj.link}}">{{obj.link}}</a></td>
+	  <td>{{obj.date.strftime('%d-%m-%Y') }}</td>
+	  <td>{{obj.status}}</td>
+	  <td>{{obj.private}}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

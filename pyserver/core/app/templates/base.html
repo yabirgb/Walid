@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" media="screen" title="no title" charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-light bg-faded">
+      <div class="nav navbar-nav">
+        <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="#">Personal Code</a>
+        <a class="nav-item nav-link" href="#">Add</a>
+      </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+  </body>
+</html>
