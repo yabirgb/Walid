@@ -6,6 +6,7 @@ var TelegramBot = require('node-telegram-bot-api');
 var mongoose = require('mongoose');
 var findOneOrCreate = require('mongoose-find-one-or-create');
 var Schema = mongoose.Schema;
+var User = require('./models/user.js')
 
 var valid_url = require('./url_check')
 
@@ -14,21 +15,6 @@ var token = '240521639:AAEOAEoYsEFNwqQWT7csYlxu5jVr4ErtInM';
 
 //========================================
 //Mongo
-
-//User schema
-var UserSchema = new Schema ({
-  username: {type:String, default: null},
-  telegramId: String,
-  links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: true}}],
-  secret: String,
-  time : { type : Date },
-  waitingReply: {type: Boolean, default: false},
-  waitingTimezone: {type: Boolean, default: false},
-  timezone: String,
-});
-UserSchema.plugin(findOneOrCreate);
-
-var User = mongoose.model('User', UserSchema)
 
 console.log("==========================\n Starting all! \n========================== ");
 
@@ -104,6 +90,7 @@ bot.onText(/\/me/, function (msg, match) {
   bot.sendMessage(fromId, "from me")
 });
 
+//Old project. From here down the bot was suppose to send the user urls
 bot.onText(/\/location/, function (msg) {
   var userID = ""
   var chatId = msg.chat.id
@@ -196,7 +183,6 @@ bot.onText(/\/love/, function (msg) {
 bot.on('message', function (msg) {
   var chatId = msg.chat.id;
   console.log("===========")
-  console.log(msg);
   if ("entities" in msg){
     //Filter using the criteria of at least one url in the entities
     if(msg.entities.filter(atLeastOneURL)){
@@ -232,6 +218,7 @@ bot.on('message', function (msg) {
             person.save(function (err) {
               if(err) { return handleError(err)}else{
                 opts = {
+                  //Dont show preview in answer
                   disable_web_page_preview: true
                 }
                 bot.sendMessage(chatId, "Added "+ url[sec] + " to the database", opts)
