@@ -8,15 +8,14 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-
     <nav class="navbar navbar-light bg-faded">
       <div class="nav navbar-nav">
-        <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="#">Personal Code</a>
-        <a class="nav-item nav-link" href="#">Add</a>
+        <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="/search/">Your links</a>
+        <a class="nav-item nav-link" href="/about/">About</a>
       </div>
     </nav>
-
+    </br>
     {% block content %}{% endblock %}
   </body>
 </html>
