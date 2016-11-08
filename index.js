@@ -62,6 +62,17 @@ var waitReply = function(id, state){
   });
 }
 
+//Check if private url
+var lockpadInText = function(text){
+    var textSplited = emojiText.convert(text, {delimiter:""}).split(" ");
+    for (var i = 0; i < textSplited.length; i++) {
+	if (textSplited[i] == "lock" || textSplited[i] == "!private"){
+	    return true
+	} 
+    }
+}
+
+
 var waitingTimezone = function(id, state){
   User.findOne({telegramId: id}, function (err, user) {
     user.waitingTimezone = state;
@@ -91,6 +102,7 @@ bot.onText(/\/me/, function (msg, match) {
 });
 
 //Old project. From here down the bot was suppose to send the user urls
+/*
 bot.onText(/\/location/, function (msg) {
   var userID = ""
   var chatId = msg.chat.id
@@ -165,7 +177,7 @@ bot.onText(/\/location/, function (msg) {
     });
   });
 });
-
+*/
 bot.onText(/\/love/, function (msg) {
   var chatId = msg.chat.id;
   var opts = {
@@ -203,28 +215,32 @@ bot.on('message', function (msg) {
               break;
             }
           }
+	  
+          if (found === false){
 
-          if (found === false)
-          {
-            User.update(
-              { "secret": person.secret },
-              { "$addToSet": { "links": {"link":url[i]} }},
-              function(err, result) {
-                if (err){
-                  return handleError(err);
-                }
-              }
-            );
-            person.save(function (err) {
-              if(err) { return handleError(err)}else{
-                opts = {
-                  //Dont show preview in answer
-                  disable_web_page_preview: true
-                }
-                bot.sendMessage(chatId, "Added "+ url[sec] + " to the database", opts)
-              };
+	      var private_link = lockpadInText(msg.text);
+	      console.log(private_link, msg.text);
+              User.update(
+		  { "secret": person.secret },
+		  { "$addToSet": { "links": {"link":url[i], "private": private_link} }},
+		  function(err, result) {
+                      if (err){
+			  return console.log(err);
+                      }
+		  }
+              );
+              person.save(function (err) {
+		  if(err) {
+		      return handleError(err)}
+		  else{
+                      opts = {
+			  //Dont show preview in answer
+			  disable_web_page_preview: true
+                      }
+                      bot.sendMessage(chatId, "Added "+ url[sec] + " to the database", opts)
+		  };
 
-            });
+              });
           }
           else{
             bot.sendMessage(chatId, "I already have this link!")
