@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema ({
   username: {type:String, default: null},
   telegramId: String,
-  links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: true}}],
+  links: [{link:String, status: {type: Boolean, default: false},date: { type: Date, default: Date.now }, private:{type: Boolean, default: false}}],
   secret: String,
   time : { type : Date },
   waitingReply: {type: Boolean, default: false},
