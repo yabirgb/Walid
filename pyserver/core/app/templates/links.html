@@ -15,14 +15,19 @@
       </thead>
       <tbody>
 	{%for obj in user.links|sort(attribute='date', reverse=True) %}
+	{% if obj.private == false %}
 	<tr>
-	  <td><a href="{{obj.link}}">{{obj.link}}</a></td>
+	  <td><a href="{{obj.link | urls_completer}} ">{{obj.link}}</a></td>
 	  <td>{{obj.date.strftime('%d-%m-%Y') }}</td>
 	  <td>{{obj.status}}</td>
 	  <td>{{obj.private}}</td>
 	</tr>
+	{% endif %}
 	{% endfor %}
       </tbody>
     </table>
   </div>
+
+  <script>
+  </script>
 {% endblock %}
