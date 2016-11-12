@@ -10,8 +10,10 @@ var User = require('./models/user.js')
 
 var valid_url = require('./url_check')
 
+//Config file with secret token
+var config = require('./secret.json')
 //TelegramToken
-var token = '240521639:AAEOAEoYsEFNwqQWT7csYlxu5jVr4ErtInM';
+var token = config.token;
 
 //========================================
 //Mongo
@@ -99,6 +101,16 @@ bot.onText(/\/echo (.+)/, function (msg, match) {
 bot.onText(/\/me/, function (msg, match) {
   var fromId = msg.from.id;
   bot.sendMessage(fromId, "from me")
+});
+
+bot.onText(/\/set_password/, function(msg, match){
+    User.update(
+	{ "username": msg.from.username},
+	{ "$addToSet": { "links": {"link":url[i], "private": private_link} }},
+	function(err, result) {
+            bot.sendMessage(msg.from.id, 'Error code: 77');
+	}
+   );
 });
 
 //Old project. From here down the bot was suppose to send the user urls
@@ -256,6 +268,7 @@ bot.on('message', function (msg) {
       if (!user.waitingReply) {
         bot.sendMessage(chatId, "Sadly I'm not programmed to understand you :(");
       }
+/*
       else if (user.waitingReply && user.waitingTimezone) {
         user.timezone = msg.text;
         waitReply(msg.from.id, false);
@@ -263,6 +276,7 @@ bot.on('message', function (msg) {
         user.save();
         bot.sendMessage(chatId, "Saved timezone for you " + user.timezone);
       }
+*/
       if (err) {
         console.log(err)
       }
