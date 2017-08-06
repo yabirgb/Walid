@@ -15,7 +15,7 @@ from models import *
 TOKEN = os.environ.get("TOKEN", None)
 DATABASE = os.environ.get("DATABASE", None)
 POCKET = os.environ.get("POCKET", None)
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
 
 

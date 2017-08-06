@@ -10,7 +10,8 @@ from telegram_bot.models import User, Link
 
 DATABASE = os.environ.get("DATABASE", None)
 POCKET = os.environ.get("POCKET", None)
-REDIRECT_URL = 'http://localhost:8000/auth/{}'
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
+REDIRECT_URL = BASE_URL + '/auth/{}'
 
 headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
 
