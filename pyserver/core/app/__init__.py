@@ -3,9 +3,12 @@ import os
 
 app = Flask(__name__)
 
+
+DEBUG = os.environ.get('DEBUG', True)
+
 app.static_folder = 'static'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.debug = True
+app.debug = DEBUG
 
 from pyserver.core.app import views
 
