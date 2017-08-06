@@ -3,10 +3,16 @@ import os
 from flask import render_template, redirect, request
 from pyserver.core.app import app
 from peewee import *
+import requests
+import json
 
 from telegram_bot.models import User, Link
 
 DATABASE = os.environ.get("DATABASE", None)
+POCKET = os.environ.get("POCKET", None)
+REDIRECT_URL = 'http://localhost:8000/auth/{}'
+
+headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
 
 db = SqliteDatabase(DATABASE)
 db.connect()
@@ -36,3 +42,45 @@ def user_search():
 @app.route('/about/')
 def about():
     return render_template('about.html')
+
+@app.route('/pocket/<tid>')
+def get_pocket(tid):
+
+    user = User.get(User.telegramId==tid)
+    if user.pocket_configured == True:
+        return "Already configured"
+
+    r_url = REDIRECT_URL.format(tid)
+    payload = dict(consumer_key=POCKET, redirect_uri=r_url)
+    r = requests.post('https://getpocket.com/v3/oauth/request', data=json.dumps(payload), headers=headers)
+
+    if r.status_code == 200:
+        code = r.json()["code"]
+        print(code)
+        q = user.update(pocket_Token=code)
+        q.execute()
+        auth_url = "https://getpocket.com/auth/authorize?request_token={}&redirect_uri={}".format(code, r_url)
+        return redirect(auth_url)
+    else:
+        return str(r.status_code)
+
+@app.route('/auth/<tid>')
+def auth(tid):
+    user = User.get(User.telegramId==tid)
+    if user.pocket_configured == True:
+        return "Already configured"
+
+    code = user.pocket_Token
+    print(code)
+    payload = {"code":code, "consumer_key": POCKET}
+    r = requests.post("https://getpocket.com/v3/oauth/authorize", data=json.dumps(payload),  headers=headers)
+    if r.status_code == 200:
+        data = r.json()
+        user = User.get(User.telegramId==tid)
+        q = user.update(pocket_Token=data["access_token"], pocket_configured=True)
+        q.execute()
+        print("Token: ", data["access_token"], "\n")
+        return redirect("/")
+    else:
+        print(r.headers)
+        return str(r.status_code)
