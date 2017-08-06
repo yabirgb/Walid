@@ -14,6 +14,7 @@ class User(Model):
     secret = CharField(unique=True)
     waitingReply = BooleanField(default=False)
     pocket_Token = CharField(null=True)
+    pocket_configured = BooleanField(default=False)
 
     class Meta:
         database = db
@@ -23,6 +24,7 @@ class Link(Model):
     date = DateTimeField()
     private = BooleanField(default=True)
     user = ForeignKeyField(User)
+    reviewed = BooleanField(default=False)
 
     class Meta:
         database = db
