@@ -5,6 +5,8 @@ app = Flask(__name__)
 
 
 DEBUG = os.environ.get('DEBUG', True)
+if DEBUG == "False":
+    DEBUG = False
 
 app.static_folder = 'static'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
