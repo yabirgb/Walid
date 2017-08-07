@@ -5,6 +5,57 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Chronon</h1>
-  <h3>Save you links for later</h3>
+
+<div class="container-fluid">
+  <h1>Walid</h1>
+  <h4 class="text-center">Saving your links for later</h4>
+  <div class="row">
+    <div class="col-xs-12 text-center center-block">
+      <a href="http://telegram.me/linkStorebot">
+        <button type="button" class="btn btn-primary"><i class="fa fa-paper-plane"></i>  chat with me</button>
+      </a>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-4 col-sm-12 text-cetner">
+      <div class="panel panel-default">
+          <div class="panel-body">
+            <p>You can send a complete url like <code>github.com</code> and
+            the bot will save it for you. It can be mixed with text.</p>
+
+            <p>Examples:
+              <ul>
+                <li><code>Walid save the url yabirgb.com</code></li>
+                <li><code>yabirgb.com</code></p></li>
+              </ul>
+            </p>
+
+            Also links in forwarded messages will be saved.
+          </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12 text-cetner">
+      <div class="panel panel-default">
+          <div class="panel-body">
+            To add links to pocket use the sintax:
+
+            <p><code>!p an_url one_tag other_tag </code></p>
+
+            <p>Example: <code>!p yabirgb.es tech dev maths </code></p>
+          </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12 text-cetner">
+      <div class="panel panel-default">
+          <div class="panel-body">
+            To configure pocket use the command <code>/pocket</code> and
+            authorize the app from your browser following the instructions.
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}
