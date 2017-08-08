@@ -3,7 +3,34 @@
 {% block title %}
 {{title}}
 {% endblock %}
+{% block head %}
 
+<style media="screen">
+  .equal {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  div[class*='colum'] {
+    flex:1 1 auto;
+    display: flex;
+  }
+  .panel {
+    flex:1 0 100%;
+  }
+  .bot{
+    background-color: #e7e7e7;
+  }
+
+  .human{
+    background-color: #53acd8;
+  }
+</style>
+
+{% endblock %}
 {% block content %}
 
 <div class="container-fluid">
@@ -17,8 +44,20 @@
     </div>
   </div>
   <br>
-  <div class="row">
-    <div class="col-md-4 col-sm-12 text-cetner">
+  <div class="row equal">
+    <div class="col-md-4 colum col-sm-12 text-cetner">
+      <div class="panel panel-default">
+          <div class="panel-body">
+            To add links to pocket account use the sintax:
+
+            <p><code>!p an_url one_tag other_tag </code></p>
+
+            <p>Example: <code>!p yabirgb.es tech dev maths </code></p>
+          </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 colum col-sm-12 text-cetner">
       <div class="panel panel-default">
           <div class="panel-body">
             <p>You can send a complete url like <code>github.com</code> and
@@ -35,22 +74,14 @@
           </div>
         </div>
     </div>
-    <div class="col-md-4 col-sm-12 text-cetner">
+
+    <div class="col-md-4 colum col-sm-12 text-cetner">
       <div class="panel panel-default">
           <div class="panel-body">
-            To add links to pocket use the sintax:
-
-            <p><code>!p an_url one_tag other_tag </code></p>
-
-            <p>Example: <code>!p yabirgb.es tech dev maths </code></p>
-          </div>
-        </div>
-    </div>
-    <div class="col-md-4 col-sm-12 text-cetner">
-      <div class="panel panel-default">
-          <div class="panel-body">
-            To configure pocket use the command <code>/pocket</code> and
-            authorize the app from your browser following the instructions.
+            <p>To configure pocket use the command <code>/pocket</code> and
+            authorize the app from your browser following the instructions.</p>
+            <p>To see your links use <code>/me</code> and the bot will give you
+            a url where you can see them.</p>
           </div>
         </div>
     </div>
