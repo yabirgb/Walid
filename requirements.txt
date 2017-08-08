@@ -8,6 +8,8 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 peewee==2.10.1
+psycopg2==2.7.3
+pyotp==2.2.6
 pyTelegramBotAPI==3.1.0
 requests==2.18.3
 six==1.10.0
