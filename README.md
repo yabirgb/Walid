@@ -10,5 +10,10 @@ A little telegram bot to store links that I get from different sources on telegr
 
 ## To do
 
-[ ] Integrate with pocket
-[ ] Private urls
+- [ ] Improve website view of links
+- [x] Integrate with pocket
+- [x] Private urls
+- [x] Pin messages
+- [x] Pin maps
+- [x] Use Postgresql instead of Sqlite
+- [x] "2FA"
