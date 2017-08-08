@@ -7,16 +7,32 @@ import requests
 import json
 
 from telegram_bot.models import User, Link
+from telegram_bot.auth import hotp
 
 DATABASE = os.environ.get("DATABASE", None)
+if DATABASE == None:
+    db = SqliteDatabase(DATABASE)
+else:
+    DB_NAME = os.environ.get("DB", None)
+    DB_USER = os.environ.get("DBUSER", None)
+    DB_PASS = os.environ.get("DBPASS", None)
+    DB_HOST = os.environ.get("DBHOST", None)
+    db = PostgresqlDatabase(
+        DB_NAME,  # Required by Peewee.
+        user=DB_USER,  # Will be passed directly to psycopg2.
+        password=DB_PASS,  # Ditto.
+        host=DB_HOST,  # Ditto.
+    )
+
+    db.connect()
+
 POCKET = os.environ.get("POCKET", None)
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 REDIRECT_URL = BASE_URL + '/auth/{}'
 
 headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
 
-db = SqliteDatabase(DATABASE)
-db.connect()
+
 
 @app.template_filter('urls_completer')
 def urls_completer(url):
@@ -27,12 +43,20 @@ def urls_completer(url):
 def index():
     return render_template('index.html',title='Home')
 
-@app.route('/secret/<secret>')
-def user_links(secret):
-    user = User.get(User.secret==secret)
-    links =Link.select().join(User).where(User.secret==secret)
-    return render_template('links.html',
-        user=user, urls=links)
+@app.route('/secret/<secret>/<code>')
+def user_links(secret, code):
+    try:
+        user = User.get(User.secret==secret)
+    except:
+        return "404"
+
+    print(code, user.authCode)
+    if hotp.verify(code, user.authCode):
+        links =Link.select().join(User).where(User.secret==secret)
+        return render_template('links.html',
+            user=user, urls=links)
+    else:
+        return "401"
 
 @app.route('/search/', methods=['GET', 'POST'])
 def user_search():
