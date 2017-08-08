@@ -8,9 +8,11 @@ import time
 
 import requests
 import telebot
+
 from peewee import *
 
 from models import *
+from auth import hotp
 
 TOKEN = os.environ.get("TOKEN", None)
 DATABASE = os.environ.get("DATABASE", None)
@@ -28,22 +30,25 @@ Bot started
 """
 )
 
+
 def urlNormalize(url):
     if not search(r'http:\/\/', url):
         return "http://" + url
     else:
         return url
 
+def create_or_get_user(message):
+    user, created = User.get_or_create(telegramId=message.from_user.id,
+                        username = message.from_user.username, authCode=0,
+                        defaults={"secret":uuid.uuid4(), "pocket_configured":False})
+    return user
 
 regex = r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
 regex_pocket = r'!p '
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    print(POCKET)
-    user, created = User.get_or_create(telegramId=message.from_user.id,
-                        username = message.from_user.username,
-                        defaults={"secret":uuid.uuid4(), "pocket_configured":False})
+    user = create_or_get_user(message)
     bot.reply_to(message, "Hi! I'm ready to store your links")
 
 @bot.message_handler(regexp=regex_pocket)
@@ -63,16 +68,14 @@ def store_pocket(message):
         print(r.headers)
 
         if(r.status_code == 200):
-            bot.reply_to(message, "Link  saved to your pocket!")
+            bot.reply_to(message, "Link saved to your pocket!")
         else:
             bot.reply_to(message, "Oh no! Something went wrong")
 
 
 @bot.message_handler(regexp=regex)
 def store_url(message):
-    user, created = User.get_or_create(telegramId=message.from_user.id,
-                        username = message.from_user.username,
-                        defaults={"secret":uuid.uuid4(), "pocket_configured":False})
+    user = create_or_get_user(message)
     positions = search(regex, message.text).span()
     Link.create(url=message.text[positions[0]:positions[1]], user = user, date =datetime.datetime.now(), private = True)
     bot.reply_to(message, "Link  saved!")
@@ -84,12 +87,29 @@ def pocket_login(message):
     bot.reply_to(message, mess)
 
 @bot.message_handler(commands=["me"])
-def on_ping(message):
+def links(message):
     user = User.get(telegramId=message.from_user.id)
-    bot.reply_to(message, BASE_URL+"/secret/" + user.secret)
+    time = int(datetime.datetime.now().timestamp())
+    q = user.update(authCode=time)
+    q.execute()
+    code = hotp.at(time)
+    bot.reply_to(message, "Access to " + BASE_URL+"/secret/" + user.secret + "/" + code)
 
 @bot.message_handler(commands=["ping"])
 def on_ping(message):
     bot.reply_to(message, "Still alive and kicking!")
+
+
+@bot.message_handler(commands=["m"])
+def store_message(message):
+    user = create_or_get_user(message)
+    Message.create(text=message.text, reviewed= False, user = user, date =datetime.datetime.now())
+    bot.reply_to(message, "Message saved")
+
+@bot.message_handler(content_types=["location"])
+def store_map(message):
+    user = create_or_get_user(message)
+    Map.create(latitude=message.location.latitude, longitude=message.location.longitude, reviewed = False, user = user, date =datetime.datetime.now())
+    bot.reply_to(message, "Location saved")
 
 bot.polling()
