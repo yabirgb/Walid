@@ -87,7 +87,8 @@ def store_url(message):
     except:
         bot.reply_to(message, "Something strange with this url")
 
-    Link.create(url=url, title=title, user = user, date =datetime.datetime.now(), private = True)
+    final_url = r.url
+    Link.create(url=final_url, title=title, user = user, date =datetime.datetime.now(), private = True)
     bot.reply_to(message, "Link  saved!")
 
 
