@@ -1,16 +1,18 @@
 import os
-
-from flask import render_template, redirect, request
-from pyserver.core.app import app
-from peewee import *
 import requests
 import json
 
-from telegram_bot.models import User, Link
+from flask import render_template, redirect, request, abort
+from pyserver.core.app import app
+from peewee import *
+from playhouse.shortcuts import model_to_dict
+
+
+from telegram_bot.models import User, Link, Map, Message
 from telegram_bot.auth import hotp
 
-DATABASE = os.environ.get("DATABASE", None)
-if DATABASE == None:
+DATABASE = bool(os.environ.get("DATABASE", True))
+if DATABASE == True:
     db = SqliteDatabase(DATABASE)
 else:
     DB_NAME = os.environ.get("DB", None)
@@ -31,9 +33,20 @@ BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 REDIRECT_URL = BASE_URL + '/auth/{}'
 
 headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
+"""
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(403)
+def page_forbidden(e):
+    return render_template('403.html'), 403
 
 
-
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+"""
 @app.template_filter('urls_completer')
 def urls_completer(url):
     return url if "://" in url else "//" + url
@@ -48,15 +61,23 @@ def user_links(secret, code):
     try:
         user = User.get(User.secret==secret)
     except:
-        return "404"
+        return "403"
 
     print(code, user.authCode)
     if hotp.verify(code, user.authCode):
-        links =Link.select().join(User).where(User.secret==secret)
+        links =Link.select().join(User).where(User.secret==secret).dicts()
+        maps = [model_to_dict(x, extra_attrs=["maps"], exclude=["latitude", "longitude"],
+                    recurse=False) for x in Map.select().join(User).where(User.secret==secret)]
+        messages = Message.select().join(User).where(User.secret==secret).dicts()
+
+        links_json = json.dumps({'data':list(links)},sort_keys=True, default=str)
+        maps_json = json.dumps({'data':list(maps)},sort_keys=True, default=str)
+        messages_json = json.dumps({'data':list(messages)},sort_keys=True, default=str)
+
         return render_template('links.html',
-            user=user, urls=links)
+            user=user, urls=links_json, maps=maps_json, messages=messages_json)
     else:
-        return "401"
+        return "403"
 
 @app.route('/search/', methods=['GET', 'POST'])
 def user_search():
