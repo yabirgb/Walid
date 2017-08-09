@@ -2,9 +2,12 @@ import os
 
 from peewee import *
 
-DATABASE = os.environ.get("DATABASE", None)
+from playhouse.hybrid import hybrid_property
 
-if DATABASE != None:
+DATABASE = bool(os.environ.get("DATABASE", False))
+MAPS = os.environ.get("MAPS", "")
+
+if DATABASE == True:
     db = SqliteDatabase(DATABASE)
 else:
     DB_NAME = os.environ.get("DB", None)
@@ -39,6 +42,7 @@ class Link(Model):
     private = BooleanField(default=True)
     user = ForeignKeyField(User)
     reviewed = BooleanField(default=False)
+    title = CharField()
 
     class Meta:
         database = db
@@ -49,6 +53,15 @@ class Map(Model):
     reviewed = BooleanField(default=False)
     date = DateTimeField()
     user = ForeignKeyField(User)
+
+    @hybrid_property
+    def maps(self):
+        url ="https://www.google.com/maps/embed/v1/view?key={}&center={},{}&zoom={}&maptype={}"
+        zoom = 16
+        view = "satellite"
+        return url.format(MAPS, self.latitude, self.longitude, zoom, view)
+
+
     class Meta:
         database = db
 
