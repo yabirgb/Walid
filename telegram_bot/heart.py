@@ -39,8 +39,9 @@ def urlNormalize(url):
 
 def create_or_get_user(message):
     user, created = User.get_or_create(telegramId=message.from_user.id,
-                        username = message.from_user.username, authCode=0,
-                        defaults={"secret":uuid.uuid4(), "pocket_configured":False})
+                        username = message.from_user.username,
+                        defaults={"authCode":0,
+                        "secret":uuid.uuid4(), "pocket_configured":False})
     return user
 
 regex = r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
@@ -77,7 +78,16 @@ def store_pocket(message):
 def store_url(message):
     user = create_or_get_user(message)
     positions = search(regex, message.text).span()
-    Link.create(url=message.text[positions[0]:positions[1]], user = user, date =datetime.datetime.now(), private = True)
+    url = message.text[positions[0]:positions[1]]
+
+    try:
+        r = requests.get(urlNormalize(url))
+        al = r.text
+        title = al[al.find('<title>') + 7 : al.find('</title>')][:254]
+    except:
+        bot.reply_to(message, "Something strange with this url")
+
+    Link.create(url=url, title=title, user = user, date =datetime.datetime.now(), private = True)
     bot.reply_to(message, "Link  saved!")
 
 
@@ -103,7 +113,7 @@ def on_ping(message):
 @bot.message_handler(commands=["m"])
 def store_message(message):
     user = create_or_get_user(message)
-    Message.create(text=message.text, reviewed= False, user = user, date =datetime.datetime.now())
+    Message.create(text=message.text[3:], reviewed= False, user = user, date =datetime.datetime.now())
     bot.reply_to(message, "Message saved")
 
 @bot.message_handler(content_types=["location"])
