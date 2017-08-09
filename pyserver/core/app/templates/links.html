@@ -22,7 +22,20 @@
         <tbody>
           <tr v-for="entry in filteredData">
             <td v-for="key in columns">
-              ${isUrl(key,entry[key])}
+              <template v-if="key === 'url'">
+                <a :href="entry[key]">${ entry[key] }</a>
+              </template>
+              <template v-else-if="key === 'maps'">
+                <iframe
+                  width="300"
+                  height="180"
+                  frameborder="0" style="border:0"
+                  :src="entry[key]">
+                </iframe>
+              </template>
+              <template v-else>
+                ${ entry[key] }
+              </template>
             </td>
           </tr>
         </tbody>
@@ -114,17 +127,6 @@
           sortBy: function (key) {
             this.sortKey = key
             this.sortOrders[key] = this.sortOrders[key] * -1
-          },
-
-          isUrl: function (key, str){
-            if (key == "url"){
-              var a = document.createElement('a');
-              $(a).attr('href',str)
-              return a
-            }
-            else{
-              return str
-            }
           }
         }
 
@@ -144,7 +146,7 @@
               this.gridColumns = ['url', 'date', 'title'],
               this.gridData = urls_data
             } else if (data_set == 'maps') {
-              this.gridColumns = ['latitude','longitude', 'date'],
+              this.gridColumns = ['maps','latitude','longitude', 'date'],
               this.gridData = maps_data
             }
             else{
