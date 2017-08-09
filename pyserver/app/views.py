@@ -2,14 +2,16 @@ import os
 import requests
 import json
 
-from flask import render_template, redirect, request, abort
-from pyserver.core.app import app
+from flask import Flask,render_template, redirect, request, abort
+
 from peewee import *
 from playhouse.shortcuts import model_to_dict
 
 
 from telegram_bot.models import User, Link, Map, Message
 from telegram_bot.auth import hotp
+
+app = Flask(__name__)
 
 DATABASE = bool(os.environ.get("DATABASE", True))
 if DATABASE == True:
