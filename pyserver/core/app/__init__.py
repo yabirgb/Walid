@@ -12,7 +12,7 @@ app.static_folder = 'static'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.debug = DEBUG
 
-from pyserver.core.app import views
+#from pyserver.core.app import views
 
-port = int(os.environ.get('PORT', 8000))
-app.run(host='0.0.0.0', port=port)
+#port = int(os.environ.get('PORT', 8000))
+#app.run(host='0.0.0.0', port=port)
