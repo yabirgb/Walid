@@ -3,28 +3,158 @@
 {% block content %}
   {{user[0]}}
   <h2>Hello {{user.username}}</h2>
-  <h4>Your secret code is {{user.secret}}</h4>
-
+  <script type="text/javascript" src="https://unpkg.com/vue@2.4.2/dist/vue.min.js"></script>
   <div class="container">
-    <table class="table">
-      <thead>
-	<th>Url</th>
-	<th>Date</th>
-	<th>Private</th>
-      </thead>
-      <tbody>
-	{%for obj in urls|sort(attribute='date', reverse=True) %}
 
-	<tr>
-	  <td><a href="{{obj.url | urls_completer}} ">{{obj.url}}</a></td>
-	  <td>{{obj.date.strftime('%d-%m-%Y') }}</td>
-	  <td>{{obj.private}}</td>
-	</tr>
-	{% endfor %}
-      </tbody>
-    </table>
+    <script type="text/x-template" id="grid-template">
+      <table class="table">
+        <thead>
+          <tr>
+            <th v-for="key in columns"
+              @click="sortBy(key)"
+              :class="{ active: sortKey == key }">
+                ${ key | capitalize }
+              <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="entry in filteredData">
+            <td v-for="key in columns">
+              ${isUrl(key,entry[key])}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </script>
+
+    <div id="demo">
+
+      <div class="btn-group btn-group-justified" role="group" aria-label="...">
+        <div class="btn-group" role="group">
+          <button type="button" @click="apply('links')" class="btn btn-default">Links</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" @click="apply('maps')" class="btn btn-default">Maps</button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" @click="apply('messages')" class="btn btn-default">Messages</button>
+        </div>
+      </div>
+
+      <form id="search">
+        <br>
+        <div class="input-group add-on">
+          <input class="form-control" placeholder="Search" name="query" v-model="searchQuery" type="text">
+        </div>
+      </form>
+      <demo-grid
+        :data="gridData"
+        :columns="gridColumns"
+        :filter-key="searchQuery">
+      </demo-grid>
+    </div>
   </div>
 
-  <script>
-  </script>
+    <script type="text/javascript">
+      var urls_data = {{urls|safe}}.data
+      var maps_data = {{maps|safe}}.data
+      var messages_data = {{messages|safe}}.data
+
+      Vue.config.delimiters = ['${', '}'];
+
+      Vue.component('demo-grid', {
+        template: '#grid-template',
+        delimiters: ['${', '}'],
+        props: {
+          data: Array,
+          columns: Array,
+          filterKey: String
+        },
+        data: function () {
+          var sortOrders = {}
+          this.columns.forEach(function (key) {
+            sortOrders[key] = 1
+          })
+          return {
+            sortKey: '',
+            sortOrders: sortOrders
+          }
+        },
+        computed: {
+          filteredData: function () {
+            var sortKey = this.sortKey
+            var filterKey = this.filterKey && this.filterKey.toLowerCase()
+            var order = this.sortOrders[sortKey] || 1
+            var data = this.data
+            if (filterKey) {
+              data = data.filter(function (row) {
+                return Object.keys(row).some(function (key) {
+                  return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+                })
+              })
+            }
+            if (sortKey) {
+              data = data.slice().sort(function (a, b) {
+                a = a[sortKey]
+                b = b[sortKey]
+                return (a === b ? 0 : a > b ? 1 : -1) * order
+              })
+            }
+            return data
+          }
+        },
+        filters: {
+          capitalize: function (str) {
+            return str.charAt(0).toUpperCase() + str.slice(1)
+          }
+        },
+        methods: {
+          sortBy: function (key) {
+            this.sortKey = key
+            this.sortOrders[key] = this.sortOrders[key] * -1
+          },
+
+          isUrl: function (key, str){
+            if (key == "url"){
+              var a = document.createElement('a');
+              $(a).attr('href',str)
+              return a
+            }
+            else{
+              return str
+            }
+          }
+        }
+
+      })
+
+      // bootstrap the demo
+      var demo = new Vue({
+        el: '#demo',
+        data: {
+          searchQuery: '',
+          gridColumns: ['url', 'date', 'title',],
+          gridData: urls_data
+        },
+        methods: {
+          apply: function (data_set) {
+            if ( data_set ==  'links'){
+              this.gridColumns = ['url', 'date', 'title'],
+              this.gridData = urls_data
+            } else if (data_set == 'maps') {
+              this.gridColumns = ['latitude','longitude', 'date'],
+              this.gridData = maps_data
+            }
+            else{
+              this.gridColumns = ['text', 'date'],
+              this.gridData = messages_data
+            }
+
+            this.searchQuery = ''
+          }
+        }
+      })
+    </script>
 {% endblock %}
