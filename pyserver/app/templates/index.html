@@ -28,6 +28,59 @@
   .human{
     background-color: #53acd8;
   }
+  body{
+    /*background-color: #008ed6;
+    color: white;*/
+  }
+
+  h1, h2{
+    text-align: center;
+    font-size: 500%;
+    /*font-family: "raleway", Verdana, Tahoma;*/
+  }
+
+  h4{
+    text-align: center;
+    /*font-family: "raleway", Verdana, Tahoma;*/
+  }
+
+  telegram-icon {
+    border:2px solid #fff;
+    display:inline-block;
+    vertical-align:middle;
+    margin-right:0.25em;
+    border-radius:100%;	width:2em;
+    height:2em;	background: #40afe7;
+    /* Old browsers */
+    background: -moz-linear-gradient(top, #40afe7 0%, #2993c9 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#40afe7), color-stop(100%,#2993c9));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #40afe7 0%,#2993c9 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #40afe7 0%,#2993c9 100%);
+    /* Opera 11.10+ */	background: -ms-linear-gradient(top, #40afe7 0%,#2993c9 100%);
+    /* IE10+ */	background: linear-gradient(to bottom, #40afe7 0%,#2993c9 100%);
+    /* W3C */	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40afe7', endColorstr='#2993c9',GradientType=0 );
+    /* IE6-9 */	text-align:center;	position:relative;
+  }
+  .cta:hover .telegram-icon {
+    background:#fff;
+    border:2px solid #40afe7;
+  }
+  .telegram-icon i {
+    position:absolute;
+    font-size:1em;
+    color:#fff;
+    margin-left:-0.05em;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    -webkit-transform: translateY(-50%) translateX(-50%);
+    -ms-transform: translateY(-50%) translateX(-50%);
+    -moz-transform: translateY(-50%) translateX(-50%);
+  }
+
+  .cta:hover .telegram-icon i {	color:#40afe7;	}
 </style>
 
 {% endblock %}
@@ -84,6 +137,12 @@
             a url where you can see them.</p>
           </div>
         </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 text-center">
+      <p>By <a href="https://twitter.com/yabirgb">@yabirgb</a></p>
     </div>
   </div>
 </div>
