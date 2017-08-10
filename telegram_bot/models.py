@@ -4,10 +4,12 @@ from peewee import *
 
 from playhouse.hybrid import hybrid_property
 
-DATABASE = bool(os.environ.get("DATABASE", False))
+
+DEBUG = bool(os.environ.get("DEBUG", False))
+DATABASE = os.environ.get("DATABASE", "")
 MAPS = os.environ.get("MAPS", "")
 
-if DATABASE == True:
+if DEBUG == None:
     db = SqliteDatabase(DATABASE)
 else:
     DB_NAME = os.environ.get("DB", None)
@@ -21,7 +23,7 @@ else:
         host=DB_HOST,  # Ditto.
     )
 
-db.connect()
+db.get_conn()
 
 
 class User(Model):

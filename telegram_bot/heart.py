@@ -101,8 +101,8 @@ def pocket_login(message):
 def links(message):
     user = User.get(telegramId=message.from_user.id)
     time = int(datetime.datetime.now().timestamp())
-    q = user.update(authCode=time)
-    q.execute()
+    q = User.update(authCode=time).where(User.telegramId==message.from_user.id)
+    num_of_row = q.execute()
     code = hotp.at(time)
     bot.reply_to(message, "Access to " + BASE_URL+"/secret/" + user.secret + "/" + code)
 
