@@ -156,8 +156,8 @@ def auth(tid):
     if r.status_code == 200:
         data = r.json()
         user = User.get(User.telegramId==tid)
-        q = user.update(pocket_Token=data["access_token"], pocket_configured=True)
-        q.execute()
+        q = User.update(pocket_Token=data["access_token"], pocket_configured=True).where(User.telegramId==tid)
+        num_of_row = q.execute()
         print("Token: ", data["access_token"], "\n")
         return redirect("/")
     else:
