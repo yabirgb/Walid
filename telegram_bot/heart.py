@@ -47,10 +47,19 @@ def create_or_get_user(message):
 regex = r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
 regex_pocket = r'!p '
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
 def send_welcome(message):
     user = create_or_get_user(message)
     bot.reply_to(message, "Hi! I'm ready to store your links")
+
+@bot.message_handler(commands=['help'])
+def send_welcome(message):
+    user = create_or_get_user(message)
+    mess = """
+            I can store links, directions and messages for you.\nYou can check the commands in the app button.
+            \nIf you still have problems contact @yabir on telegram or @yabirgb on twitter.
+    """
+    bot.reply_to(message, mess)
 
 @bot.message_handler(regexp=regex_pocket)
 def store_pocket(message):
