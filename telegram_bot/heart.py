@@ -73,7 +73,7 @@ def send_welcome(message):
     \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
     \nIf you still have problems contact @yabir on telegram.
     """
-    bot.reply_to(message, mess)
+    bot.reply_to(message, text)
 
 @bot.message_handler(regexp=regex_pocket)
 def store_pocket(message):
