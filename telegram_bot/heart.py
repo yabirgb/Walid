@@ -50,14 +50,28 @@ regex_pocket = r'!p '
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user = create_or_get_user(message)
-    bot.reply_to(message, "Hi! I'm ready to store your links")
+    text = """
+    * Send me any url and it will be stored. If it is mixed with text, I will found it! 👍🏼
+    \n* To configure your pocket account use `/pocket` and follow the instructions
+    \n* Display all your urls using `/me` and visit the url 💻
+    \n* To store a location share it using telegram's ubication share 📲
+    \n* Save a message typing `/m text_to_send` ✉️
+    \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
+    \nIf you still have problems contact @yabir on telegram.
+    """
+    bot.reply_to(message, text)
 
 @bot.message_handler(commands=['help'])
 def send_welcome(message):
     user = create_or_get_user(message)
-    mess = """
-            I can store links, directions and messages for you.\nYou can check the commands in the app button.
-            \nIf you still have problems contact @yabir on telegram or @yabirgb on twitter.
+    text = """
+    * Send me any url and it will be stored. If it is mixed with text, I will found it! 👍🏼
+    \n* To configure your pocket account use `/pocket` and follow the instructions
+    \n* Display all your urls using `/me` and visit the url 💻
+    \n* To store a location share it using telegram's ubication share 📲
+    \n* Save a message typing `/m text_to_send` ✉️
+    \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
+    \nIf you still have problems contact @yabir on telegram.
     """
     bot.reply_to(message, mess)
 
