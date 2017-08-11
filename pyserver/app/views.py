@@ -7,6 +7,7 @@ from flask import Flask,render_template, redirect, request, abort
 from peewee import *
 from playhouse.shortcuts import model_to_dict
 from htmlmin.minify import html_minify
+import peeweedbevolve
 
 from telegram_bot.models import User, Link, Map, Message
 from telegram_bot.auth import hotp

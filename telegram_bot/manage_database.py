@@ -5,7 +5,7 @@ import random
 
 def start():
     print("Starting creation of tables in " + str(DATABASE))
-    db.create_tables([User, Link, Map, Message], safe=True)
+    db.evolve([User, Link, Map, Message])
     print("Tables created")
 
 def users_count():

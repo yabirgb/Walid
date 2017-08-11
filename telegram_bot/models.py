@@ -1,7 +1,7 @@
 import os
 
 from peewee import *
-
+import peeweedbevolve
 from playhouse.hybrid import hybrid_property
 
 
@@ -27,7 +27,7 @@ db.get_conn()
 
 
 class User(Model):
-    username = CharField()
+    username = CharField(null=True)
     telegramId = CharField(unique=True)
     secret = CharField(unique=True)
     authCode = IntegerField()
