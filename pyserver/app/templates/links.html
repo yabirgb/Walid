@@ -30,14 +30,30 @@ Walid - {{user.username}}
               <template v-if="key === 'url'">
                 <a :href="entry[key]">${ entry[key] }</a>
               </template>
+
               <template v-else-if="key === 'maps'">
+
                 <iframe
                   width="300"
                   height="180"
                   frameborder="0" style="border:0"
                   :src="entry[key]">
                 </iframe>
+
               </template>
+
+              <template v-else-if="key === 'reviewed'">
+
+                  <template v-if="entry[key] === false">
+                    <input type="checkbox" @click="check(entry[key])" />
+                  </template>
+
+                  <template v-else>
+                    <input type="checkbox" checked @click="check(entry[key])"/>
+                  </template>
+
+              </template>
+
               <template v-else>
                 ${ entry[key] }
               </template>
@@ -142,13 +158,13 @@ Walid - {{user.username}}
         el: '#demo',
         data: {
           searchQuery: '',
-          gridColumns: ['url', 'date', 'title',],
+          gridColumns: ['url', 'date', 'title', 'reviewed'],
           gridData: urls_data
         },
         methods: {
           apply: function (data_set) {
             if ( data_set ==  'links'){
-              this.gridColumns = ['url', 'date', 'title'],
+              this.gridColumns = ['url', 'date', 'title', 'reviewed'],
               this.gridData = urls_data
             } else if (data_set == 'maps') {
               this.gridColumns = ['maps','latitude','longitude', 'date'],
