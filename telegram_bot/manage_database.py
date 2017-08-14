@@ -32,8 +32,14 @@ def send_mess(pk, message):
     bot.send_message(pk, message)
 
 def bulk(message):
+    blocked = 0
     for u in User.select():
-        send_mess(u.telegramId, message)
+        try:
+            send_mess(u.telegramId, message)
+        except:
+            blocked += 1
+
+    print(blocked)
 
 
 if __name__ == '__main__':
