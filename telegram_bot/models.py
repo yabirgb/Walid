@@ -5,12 +5,21 @@ import peeweedbevolve
 from playhouse.hybrid import hybrid_property
 
 
-DEBUG = bool(os.environ.get("DEBUG", False))
+DEBUG = bool(os.environ.get("DBDEBUG", False))
 DATABASE = os.environ.get("DATABASE", "")
 MAPS = os.environ.get("MAPS", "")
 
-if DEBUG == None:
-    db = SqliteDatabase(DATABASE)
+if DEBUG == True:
+    DB_NAME = "walid_test"
+    DB_USER = os.environ.get("DBUSER", None)
+    DB_PASS = os.environ.get("DBPASS", None)
+    DB_HOST = os.environ.get("DBHOST", None)
+    db = PostgresqlDatabase(
+        DB_NAME,  # Required by Peewee.
+        user=DB_USER,  # Will be passed directly to psycopg2.
+        password=DB_PASS,  # Ditto.
+        host=DB_HOST,  # Ditto.
+    )
 else:
     DB_NAME = os.environ.get("DB", None)
     DB_USER = os.environ.get("DBUSER", None)
