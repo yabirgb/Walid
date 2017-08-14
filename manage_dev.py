@@ -6,7 +6,7 @@ import json
 from urllib.parse import quote_plus, urlparse
 import time
 import requests
-
+from lxml.html import fromstring
 
 from peewee import *
 import peeweedbevolve
@@ -57,8 +57,8 @@ def me(u="yabir"):
 def store_url(url):
     user = fake_user()
     r = requests.get(urlNormalize(url))
-    al = r.text
-    title = al[al.find('<title>') + 7 : al.find('</title>')][:254]
+    tree = fromstring(r.content)
+    title = str(tree.findtext('.//title'))
 
     final_url = r.url
     Link.create(url=final_url, title=title, user = user, date =datetime.datetime.now(), private = True)

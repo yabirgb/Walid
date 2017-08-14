@@ -7,6 +7,7 @@ from urllib.parse import quote_plus, urlparse
 import time
 
 import requests
+from lxml.html import fromstring
 import telebot
 
 from peewee import *
@@ -105,14 +106,15 @@ def store_url(message):
 
     try:
         r = requests.get(urlNormalize(url))
-        al = r.text
-        title = al[al.find('<title>') + 7 : al.find('</title>')][:254]
+        tree = fromstring(r.content)
+        title = str(tree.findtext('.//title'))
+        final_url = r.url
+        Link.create(url=final_url, title=title, user = user, date =datetime.datetime.now(), private = True)
+        bot.reply_to(message, "Link  saved!")
     except:
         bot.reply_to(message, "Something strange with this url")
 
-    final_url = r.url
-    Link.create(url=final_url, title=title, user = user, date =datetime.datetime.now(), private = True)
-    bot.reply_to(message, "Link  saved!")
+
 
 
 @bot.message_handler(commands=['pocket'])
