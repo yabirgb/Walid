@@ -3,6 +3,11 @@ from models import *
 import datetime
 import random
 
+import telebot
+
+TOKEN = os.environ.get("TOKEN", None)
+bot = telebot.TeleBot(TOKEN)
+
 def start():
     print("Starting creation of tables in " + str(DATABASE))
     db.evolve([User, Link, Map, Message])
@@ -23,6 +28,14 @@ def cycle_code():
 
     print("Auth code modifications: " + str(num_of_row))
 
+def send_mess(pk, message):
+    bot.send_message(pk, message)
+
+def bulk(message):
+    for u in User.select():
+        send_mess(u.telegramId, message)
+
+
 if __name__ == '__main__':
     import sys
     if sys.argv[1] == "start":
@@ -31,3 +44,7 @@ if __name__ == '__main__':
         users_count()
     elif sys.argv[1] == "codes":
         cycle_code()
+    elif sys.argv[1] == "send":
+        send_mess(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "bulk":
+        bulk(sys.argv[2])
