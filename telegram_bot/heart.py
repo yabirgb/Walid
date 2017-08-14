@@ -51,6 +51,8 @@ regex_pocket = r'!p '
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user = create_or_get_user(message)
+    user.waitingReply = False
+    user.save()
     text = """
     * Send me any url and it will be stored. If it is mixed with text, I will found it! 👍🏼
     \n* To configure your pocket account use `/pocket` and follow the instructions
@@ -75,6 +77,12 @@ def send_welcome(message):
     \nIf you still have problems contact @yabir on telegram.
     """
     bot.reply_to(message, text)
+
+@bot.message_handler(commands=["stop"])
+def stop(message):
+    user = User.get(telegramId=message.from_user.id)
+    q = User.update(waitingReply=True).where(User.telegramId==message.from_user.id)
+    num_of_row = q.execute()
 
 @bot.message_handler(regexp=regex_pocket)
 def store_pocket(message):
