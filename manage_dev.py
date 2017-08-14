@@ -53,8 +53,7 @@ def me(u="yabir"):
         q = User.update(authCode=time).where(User.username==u)
         num_of_row = q.execute()
         code = hotp.at(time)
-        print ("Access to " + "http://walid.yabirgb.com" +"/secret/" + user.secret + "/" + str(code))
-
+        print ("Access to " + "http://walid.yabirgb.com" +"/secret/" + str(user.secret) + "/" + str(code))
 def store_url(url):
     user = fake_user()
     r = requests.get(urlNormalize(url))

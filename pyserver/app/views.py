@@ -176,3 +176,32 @@ def auth(tid):
     else:
         print(r.headers)
         return str(r.status_code)
+
+# ========
+# Api
+# ========
+@app.route('/api/<secret>/<code>/<obj>/<pk>')
+def toggle_show(secret, code, obj, pk):
+
+    try:
+        user = User.get(User.secret==secret)
+    except:
+        return "403 - Secret code invalid"
+    if hotp.verify(code, user.authCode):
+        if obj == "link":
+            link = Link.get(Link.id == pk)
+            link.reviewed = not link.reviewed
+            link.save()
+            return "ok"
+        elif obj == "maps":
+            location = Map.get(Map.id == pk)
+            location.reviewed = not location.reviewed
+            location.save()
+            return "ok"
+        elif obj == "messages":
+            message = Message.get(Message.id == pk)
+            message.reviewed = not message.reviewed
+            message.save()
+            return "ok"
+    else:
+        return 403
