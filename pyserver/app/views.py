@@ -14,9 +14,19 @@ from telegram_bot.auth import hotp
 
 app = Flask(__name__)
 
-DATABASE = bool(os.environ.get("DATABASE", True))
-if DATABASE == True:
-    db = SqliteDatabase(DATABASE)
+DEBUG = bool(os.environ.get("DBDEBUG", True))
+if DEBUG == True:
+    print("yeah")
+    DB_NAME = "walid_test"
+    DB_USER = os.environ.get("DBUSER", None)
+    DB_PASS = os.environ.get("DBPASS", None)
+    DB_HOST = os.environ.get("DBHOST", None)
+    db = PostgresqlDatabase(
+        DB_NAME,  # Required by Peewee.
+        user=DB_USER,  # Will be passed directly to psycopg2.
+        password=DB_PASS,  # Ditto.
+        host=DB_HOST,  # Ditto.
+    )
 else:
     DB_NAME = os.environ.get("DB", None)
     DB_USER = os.environ.get("DBUSER", None)
@@ -29,7 +39,9 @@ else:
         host=DB_HOST,  # Ditto.
     )
 
-    db.connect()
+
+db.get_conn()
+
 
 POCKET = os.environ.get("POCKET", None)
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
@@ -76,7 +88,7 @@ def user_links(secret, code):
     try:
         user = User.get(User.secret==secret)
     except:
-        return "403"
+        return "403 - Secret code invalid"
 
     print(code, user.authCode)
     if hotp.verify(code, user.authCode):
@@ -95,7 +107,7 @@ def user_links(secret, code):
         return html_minify(html)
 
     else:
-        return "403"
+        return "403 - Auth code error"
 
 @app.route('/search/', methods=['GET', 'POST'])
 def user_search():
@@ -148,7 +160,7 @@ def auth(tid):
     """
     user = User.get(User.telegramId==tid)
     if user.pocket_configured == True:
-        return "Already configured"
+        return "Pocket already configured"
 
     code = user.pocket_Token
     print(code)
