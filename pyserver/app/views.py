@@ -2,7 +2,7 @@ import os
 import requests
 import json
 
-from flask import Flask,render_template, redirect, request, abort
+from flask import (Flask,render_template, redirect, request, abort, jsonify)
 
 from peewee import *
 from playhouse.shortcuts import model_to_dict
@@ -72,6 +72,10 @@ def index():
     html = render_template('index.html',title='Home')
     return html_minify(html)
 
+@app.route('/changelog')
+def changelog():
+    html = render_template('changelog.html',title='changelog')
+    return html_minify(html)
 
 @app.route('/secret/<secret>/<code>')
 def user_links(secret, code):
@@ -103,7 +107,7 @@ def user_links(secret, code):
 
         html = render_template('links.html',
                                 user=user, urls=links_json, maps=maps_json,
-                                messages=messages_json)
+                                messages=messages_json, secret=secret , code=code)
         return html_minify(html)
 
     else:
@@ -192,7 +196,12 @@ def toggle_show(secret, code, obj, pk):
             link = Link.get(Link.id == pk)
             link.reviewed = not link.reviewed
             link.save()
-            return "ok"
+
+            links =Link.select().join(User).where(User.secret==secret).dicts()
+            response_code = 200
+
+            return jsonify( response_code = 200, data =list(links) )
+
         elif obj == "maps":
             location = Map.get(Map.id == pk)
             location.reviewed = not location.reviewed
@@ -203,5 +212,7 @@ def toggle_show(secret, code, obj, pk):
             message.reviewed = not message.reviewed
             message.save()
             return "ok"
+        else:
+            return "404"
     else:
-        return 403
+        return "403"
