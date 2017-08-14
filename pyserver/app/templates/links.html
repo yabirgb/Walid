@@ -45,11 +45,11 @@ Walid - {{user.username}}
               <template v-else-if="key === 'reviewed'">
 
                   <template v-if="entry[key] === false">
-                    <input type="checkbox" @click="check(entry[key])" />
+                    <input type="checkbox" @click="reviewed(entry.id)" />
                   </template>
 
                   <template v-else>
-                    <input type="checkbox" checked @click="check(entry[key])"/>
+                    <input type="checkbox" checked @click="reviewed(entry.id)"/>
                   </template>
 
               </template>
@@ -116,6 +116,9 @@ Walid - {{user.username}}
             sortOrders: sortOrders
           }
         },
+        mounted: {
+          //this.sortBy("date")
+        },
         computed: {
           filteredData: function () {
             var sortKey = this.sortKey
@@ -148,6 +151,19 @@ Walid - {{user.username}}
           sortBy: function (key) {
             this.sortKey = key
             this.sortOrders[key] = this.sortOrders[key] * -1
+          },
+
+          reviewed: function(key_id){
+
+            var jqxhr = $.get( "/api/{{secret}}/{{code}}/link/" + key_id, function(response) {
+                urls_data = response.data
+                console.log(response)
+              })
+                .fail(function() {
+                  alert( "error" );
+                })
+
+
           }
         }
 
