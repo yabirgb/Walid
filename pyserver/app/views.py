@@ -145,8 +145,8 @@ def get_pocket(tid):
     if r.status_code == 200:
         code = r.json()["code"]
         print(code)
-        q = User.update(pocket_Token=code).where(User.telegramId==tid)
-        q.execute()
+        user.pocket_Token = code
+        user.save()
         auth_url = "https://getpocket.com/auth/authorize?request_token={}&redirect_uri={}".format(code, r_url)
         return redirect(auth_url)
     else:
@@ -173,8 +173,9 @@ def auth(tid):
     if r.status_code == 200:
         data = r.json()
         user = User.get(User.telegramId==tid)
-        q = User.update(pocket_Token=data["access_token"], pocket_configured=True).where(User.telegramId==tid)
-        num_of_row = q.execute()
+        user.pocket_Token=data["access_token"]
+        user.pocket_configured=True
+        user.save()
         print("Token: ", data["access_token"], "\n")
         return redirect("/")
     else:
