@@ -54,10 +54,10 @@ def send_welcome(message):
     user.waitingReply = False
     user.save()
     text = """
-    * Send me any url and it will be stored. If it is mixed with text, I will found it! 👍🏼
+    * Send me any url and it will be stored. If it is mixed with text, I will find it! 👍🏼
     \n* To configure your pocket account use `/pocket` and follow the instructions
     \n* Display all your urls using `/me` and visit the url 💻
-    \n* To store a location share it using telegram's ubication share 📲
+    \n* To store a location share it using telegram's location share 📲
     \n* Save a message typing `/m text_to_send` ✉️
     \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
     \nIf you still have problems contact @yabir on telegram.
@@ -68,10 +68,10 @@ def send_welcome(message):
 def send_welcome(message):
     user = create_or_get_user(message)
     text = """
-    * Send me any url and it will be stored. If it is mixed with text, I will found it! 👍🏼
+    * Send me any url and it will be stored. If it is mixed with text, I will find it! 👍🏼
     \n* To configure your pocket account use `/pocket` and follow the instructions
     \n* Display all your urls using `/me` and visit the url 💻
-    \n* To store a location share it using telegram's ubication share 📲
+    \n* To store a location share it using telegram's location share 📲
     \n* Save a message typing `/m text_to_send` ✉️
     \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
     \nIf you still have problems contact @yabir on telegram.
