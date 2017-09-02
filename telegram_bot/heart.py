@@ -58,8 +58,8 @@ def send_welcome(message):
     \n* To configure your pocket account use `/pocket` and follow the instructions
     \n* Display all your urls using `/me` and visit the url 💻
     \n* To store a location share it using telegram's location share 📲
-    \n* Save a message typing `/m text_to_send` ✉️
-    \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
+    \n* Save a message typing `/m text_to_save` ✉️
+    \n* Saving urls to pocket is easy, use the syntax `!p url tag1 tag2 ...` 😄
     \nIf you still have problems contact @yabir on telegram.
     """
     bot.reply_to(message, text)
@@ -72,8 +72,8 @@ def send_welcome(message):
     \n* To configure your pocket account use `/pocket` and follow the instructions
     \n* Display all your urls using `/me` and visit the url 💻
     \n* To store a location share it using telegram's location share 📲
-    \n* Save a message typing `/m text_to_send` ✉️
-    \n* Saving urls to pocket is easy, use the sintax `!p url tag1 tag2 ...` 😄
+    \n* Save a message typing `/m text_to_save` ✉️
+    \n* Saving urls to pocket is easy, use the syntax `!p url tag1 tag2 ...` 😄
     \nIf you still have problems contact @yabir on telegram.
     """
     bot.reply_to(message, text)
