@@ -5,7 +5,7 @@ import os
 import json
 from urllib.parse import quote_plus, urlparse
 import time
-import logging
+from logging import Logger as logger
 
 import requests
 from lxml.html import fromstring
