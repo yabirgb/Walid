@@ -1,4 +1,4 @@
-import os
+    import os
 import requests
 import json
 
@@ -167,9 +167,9 @@ def auth(tid):
         return "Pocket already configured"
 
     code = user.pocket_Token
-    print(code)
     payload = {"code":code, "consumer_key": POCKET}
     r = requests.post("https://getpocket.com/v3/oauth/authorize", data=json.dumps(payload),  headers=headers)
+    print(r.json)
     if r.status_code == 200:
         data = r.json()
         user = User.get(User.telegramId==tid)
