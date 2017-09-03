@@ -157,12 +157,4 @@ def store_map(message):
     Map.create(latitude=message.location.latitude, longitude=message.location.longitude, reviewed = False, user = user, date =datetime.datetime.now())
     bot.reply_to(message, "Location saved")
 
-while True:
-    try:
-        bot.polling(none_stop=True)
-    # ConnectionError and ReadTimeout because of possible timout of the requests library
-    # TypeError for moviepy errors
-    # maybe there are others, therefore Exception
-    except Exception as e:
-        logger.error(e)
-        time.sleep(15)
+bot.polling(none_stop=True)
