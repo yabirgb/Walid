@@ -27,8 +27,6 @@ db = PostgresqlDatabase(
     host=DB_HOST,  # Ditto.
 )
 
-db.get_conn()
-
 TOKEN = os.environ.get("OTP", "JBSWY3DPEHPK3PXP")
 hotp = pyotp.HOTP(TOKEN)
 
@@ -158,6 +156,18 @@ def auth(tid):
         print(r.headers)
         return str(r.status_code)
 
+@app.before_request
+def _db_connect():
+    print("open")
+    db.get_conn()
+
+# This hook ensures that the connection is closed when we've finished
+# processing the request.
+@app.teardown_request
+def _db_close(exc):
+    print("closed")
+    if not db.is_closed():
+        db.close()
 # ========
 # Api
 # ========
