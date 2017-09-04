@@ -8,60 +8,36 @@ from peewee import *
 from playhouse.shortcuts import model_to_dict
 from htmlmin.minify import html_minify
 import peeweedbevolve
+import pyotp
+
 
 from telegram_bot.models import User, Link, Map, Message
-from telegram_bot.auth import hotp
 
 app = Flask(__name__)
 
-DEBUG = bool(os.environ.get("DBDEBUG", True))
-if DEBUG == True:
-    print("yeah")
-    DB_NAME = "walid_test"
-    DB_USER = os.environ.get("DBUSER", None)
-    DB_PASS = os.environ.get("DBPASS", None)
-    DB_HOST = os.environ.get("DBHOST", None)
-    db = PostgresqlDatabase(
-        DB_NAME,  # Required by Peewee.
-        user=DB_USER,  # Will be passed directly to psycopg2.
-        password=DB_PASS,  # Ditto.
-        host=DB_HOST,  # Ditto.
-    )
-else:
-    DB_NAME = os.environ.get("DB", None)
-    DB_USER = os.environ.get("DBUSER", None)
-    DB_PASS = os.environ.get("DBPASS", None)
-    DB_HOST = os.environ.get("DBHOST", None)
-    db = PostgresqlDatabase(
-        DB_NAME,  # Required by Peewee.
-        user=DB_USER,  # Will be passed directly to psycopg2.
-        password=DB_PASS,  # Ditto.
-        host=DB_HOST,  # Ditto.
-    )
 
+DB_NAME = os.environ.get("DB", None)
+DB_USER = os.environ.get("DBUSER", None)
+DB_PASS = os.environ.get("DBPASS", None)
+DB_HOST = os.environ.get("DBHOST", None)
+db = PostgresqlDatabase(
+    DB_NAME,  # Required by Peewee.
+    user=DB_USER,  # Will be passed directly to psycopg2.
+    password=DB_PASS,  # Ditto.
+    host=DB_HOST,  # Ditto.
+)
 
 db.get_conn()
 
+TOKEN = os.environ.get("OTP", "JBSWY3DPEHPK3PXP")
+hotp = pyotp.HOTP(TOKEN)
 
 POCKET = os.environ.get("POCKET", None)
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 REDIRECT_URL = BASE_URL + '/auth/{}'
 
 headers = {'Content-Type' : 'application/json; charset=UTF-8','X-Accept': 'application/json'}
-"""
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
 
-@app.errorhandler(403)
-def page_forbidden(e):
-    return render_template('403.html'), 403
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
-"""
 @app.template_filter('urls_completer')
 def urls_completer(url):
     return url if "://" in url else "//" + url

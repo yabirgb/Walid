@@ -10,11 +10,15 @@ from logging import Logger as logger
 import requests
 from lxml.html import fromstring
 import telebot
+import pyotp
 
 from peewee import *
 
 from models import *
-from auth import hotp
+
+TOKEN = os.environ.get("OTP", "JBSWY3DPEHPK3PXP")
+hotp = pyotp.HOTP(TOKEN)
+
 
 TOKEN = os.environ.get("TOKEN", None)
 DATABASE = os.environ.get("DATABASE", None)
