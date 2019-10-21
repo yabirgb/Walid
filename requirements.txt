@@ -17,7 +17,7 @@ peewee-db-evolve==0.6.4
 psycopg2==2.7.3
 pyotp==2.2.6
 pyTelegramBotAPI==3.1.0
-requests==2.18.3
+requests==2.20.0
 six==1.10.0
 urllib3==1.22
 webencodings==0.5.1
