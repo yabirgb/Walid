@@ -10,7 +10,7 @@ html5lib==0.999999999
 idna==2.5
 itsdangerous==0.24
 Jinja2==2.9.6
-lxml==3.8.0
+lxml==4.6.3
 MarkupSafe==1.0
 peewee==2.10.1
 peewee-db-evolve==0.6.4
